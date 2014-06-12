@@ -74,16 +74,6 @@ module.exports = function(grunt) {
 				dest: 'bin',
 				ext: '.js'
 			}
-		},
-
-		watch: {
-			coffee: {
-				files: ['src/**/*.coffee'],
-				tasks: ['coffee:build', 'test'],
-				options: {
-					spawn: false
-				}
-			}
 		}
 
 	});
@@ -96,7 +86,6 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-nodeunit');
 	grunt.loadNpmTasks('grunt-contrib-coffee');
-	grunt.loadNpmTasks('grunt-contrib-watch');
 
 	// Whenever the "test" task is run, first clean the "tmp" dir, then run this
 	// plugin's task(s), then test the result.
@@ -105,6 +94,6 @@ module.exports = function(grunt) {
 	// By default, lint and run all tests.
 	grunt.registerTask('default', ['coffee:build', 'jshint', 'test']);
 
-	grunt.registerTask('build', ['coffee:build', 'phantomjs_screenshot']);
+	grunt.registerTask('build', ['coffee:build']);
 
 };

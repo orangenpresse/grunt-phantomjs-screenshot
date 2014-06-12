@@ -5,7 +5,7 @@
   "homepage": "https://github.com/orangenpresse/grunt-phantomjs-screenshot",
   "author": {
     "name": "Benedict Burckhart",
-    "email": "info@bebuso.de"
+    "email": "info@code-plant.de"
   },
   "repository": {
     "type": "git",
@@ -32,7 +32,6 @@
     "grunt-contrib-coffee": "^0.10.1",
     "grunt-contrib-jshint": "^0.9.2",
     "grunt-contrib-nodeunit": "^0.3.3",
-    "grunt-contrib-watch": "^0.6.1",
     "node-phantom-simple": "^1.2.0",
     "phantomjs": "^1.9.7-8"
   },
