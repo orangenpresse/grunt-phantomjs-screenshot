@@ -8,24 +8,38 @@
 
 'use strict';
 
+var Screenshooter = require('../bin/Screenshooter');
+
 module.exports = function(grunt) {
 
 	// Please see the Grunt documentation for more information regarding task
 	// creation: http://gruntjs.com/creating-tasks
 
 	grunt.registerMultiTask('phantomjs_screenshot', 'Takes screenshots of html files with phantomjs', function() {
+		var self = this;
+		var done = this.async();
+
 		// Merge task-specific and/or target-specific options with these defaults.
 		var options = this.options({
 			punctuation: '.',
 			separator: ', '
 		});
 
+		var screenshooter = new Screenshooter();
+		screenshooter.init(options, function() {
+			console.log('done');
+			self.files.forEach(function(file) {
+				//grunt.log.writeln(f);
+				screenshooter.takeScreenshot(file);
+			});
+			setTimeout(function() {
+				done();
+			},2000);
+		});
+
 		// Iterate over all specified file groups.
-		this.files.forEach(function(f) {
-			grunt.log.writeln(f);
-			console.log(f);
-
-
+		//this.files.forEach(function(file) {
+			//grunt.log.writeln(f);
 
 			// // Concat specified files.
 			// var src = f.src.filter(function(filepath) {
@@ -49,7 +63,7 @@ module.exports = function(grunt) {
 
 			// // Print a success message.
 			// grunt.log.writeln('File "' + f.dest + '" created.');
-		});
+		//});
 	});
 
 };
