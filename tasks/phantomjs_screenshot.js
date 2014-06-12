@@ -12,58 +12,22 @@ var Screenshooter = require('../bin/Screenshooter');
 
 module.exports = function(grunt) {
 
-	// Please see the Grunt documentation for more information regarding task
-	// creation: http://gruntjs.com/creating-tasks
-
 	grunt.registerMultiTask('phantomjs_screenshot', 'Takes screenshots of html files with phantomjs', function() {
 		var self = this;
 		var done = this.async();
 
 		// Merge task-specific and/or target-specific options with these defaults.
 		var options = this.options({
-			punctuation: '.',
-			separator: ', '
+			viewport: '1024x768',
+			delay: 300
 		});
 
 		var screenshooter = new Screenshooter();
-		screenshooter.init(options, function() {
-			console.log('done');
-			self.files.forEach(function(file) {
-				//grunt.log.writeln(f);
-				screenshooter.takeScreenshot(file);
-			});
-			setTimeout(function() {
+		screenshooter.init(grunt, options, function() {
+			screenshooter.takeScreenshots(self.files, function() {
 				done();
-			},2000);
+			});
 		});
-
-		// Iterate over all specified file groups.
-		//this.files.forEach(function(file) {
-			//grunt.log.writeln(f);
-
-			// // Concat specified files.
-			// var src = f.src.filter(function(filepath) {
-			//	// Warn on and remove invalid source files (if nonull was set).
-			//	if (!grunt.file.exists(filepath)) {
-			//	grunt.log.warn('Source file "' + filepath + '" not found.');
-			//	return false;
-			//	} else {
-			//	return true;
-			//	}
-			// }).map(function(filepath) {
-			//	// Read file source.
-			//	return grunt.file.read(filepath);
-			// }).join(grunt.util.normalizelf(options.separator));
-
-			// // Handle options.
-			// src += options.punctuation;
-
-			// // Write the destination file.
-			// grunt.file.write(f.dest, src);
-
-			// // Print a success message.
-			// grunt.log.writeln('File "' + f.dest + '" created.');
-		//});
 	});
 
 };

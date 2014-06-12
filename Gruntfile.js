@@ -31,7 +31,10 @@ module.exports = function(grunt) {
 		// Configuration to be run (and then tested).
 		phantomjs_screenshot: {
 			default_options: {
-				options: {},
+				options: {
+					viewport: '1024x768',
+					delay: 300
+				},
 				files: [{
 					expand: true,
 					flatten: false,
