@@ -35,6 +35,10 @@
     "node-phantom-simple": "^1.2.0",
     "phantomjs": "^1.9.7-8"
   },
+  "dependencies": {
+    "node-phantom-simple": "^1.2.0",
+    "phantomjs": "^1.9.7-8"
+  },
   "peerDependencies": {
     "grunt": "~0.4.5"
   },
