@@ -1,5 +1,5 @@
 
-/* 
+/**
  * Screenshooter
  * https://github.com/orangenpresse/grunt-phantomjs-screenshot
  *
@@ -16,8 +16,9 @@
   Screenshooter = (function() {
     function Screenshooter() {}
 
-    Screenshooter.prototype.init = function(grunt, options, callback) {
+    Screenshooter.prototype.init = function(grunt, done, options, callback) {
       this.grunt = grunt;
+      this.done = done;
       this.options = options;
       return phantom.create(this.getCreateCallback(callback), {
         phantomPath: require('phantomjs').path
@@ -27,45 +28,61 @@
     Screenshooter.prototype.takeScreenshot = function(file) {
       var filename;
       filename = file.src[0];
-      return this.page.open(filename, this.getPageOpenCallback((function(_this) {
-        return function() {
-          _this.setViewport(_this.options.viewport);
-          return setTimeout(function() {
-            _this.page.render(file.dest);
-            return _this.setScreenshotDone(file);
-          }, _this.options.delay);
+      return this.ph.createPage(this.getPageCallback((function(_this) {
+        return function(page) {
+          return page.open(filename, _this.getPageOpenCallback(function() {
+            _this.setBackgroundColor(page);
+            return setTimeout(function() {
+              page.render(file.dest, {
+                quality: _this.options.quality
+              });
+              return _this.setScreenshotDone(file);
+            }, _this.options.delay);
+          }));
         };
       })(this)));
     };
 
-    Screenshooter.prototype.setViewport = function(viewport) {
+    Screenshooter.prototype.setBackgroundColor = function(page) {
+      return page.evaluate(function() {
+
+        /* global document */
+        return document.body.bgColor = 'white';
+      });
+    };
+
+    Screenshooter.prototype.setViewport = function(page, viewport, callback) {
       var resolution;
       resolution = viewport.split(/x/);
-      return this.page.viewportSize = {
+      return page.set('viewportSize', {
         width: resolution[0],
         height: resolution[1]
-      };
+      }, callback);
     };
 
     Screenshooter.prototype.getCreateCallback = function(callback) {
       return (function(_this) {
         return function(err, ph) {
           if (err === null) {
-            return ph.createPage(_this.getPageCallback(ph, callback));
+            _this.ph = ph;
+            return callback();
           } else {
-            return _this.grunt.log.error("PhantomJsCreateError: " + err.msg);
+            _this.grunt.log.error("PhantomJsCreateError: " + err.msg);
+            return _this.done();
           }
         };
       })(this);
     };
 
-    Screenshooter.prototype.getPageCallback = function(ph, callback) {
+    Screenshooter.prototype.getPageCallback = function(callback) {
       return (function(_this) {
         return function(err, page) {
           if (err === null) {
-            _this.page = page;
-            return callback();
+            return _this.setViewport(page, _this.options.viewport, function() {
+              return callback(page);
+            });
           } else {
+            _this.setScreenshotDone();
             return _this.grunt.log.error("PageCreateError: " + err.msg);
           }
         };
@@ -89,9 +106,8 @@
       })(this);
     };
 
-    Screenshooter.prototype.takeScreenshots = function(files, done) {
+    Screenshooter.prototype.takeScreenshots = function(files) {
       this.screenshotCount = files.length;
-      this.done = done;
       return files.forEach((function(_this) {
         return function(file) {
           return _this.takeScreenshot(file);
@@ -104,7 +120,12 @@
         this.grunt.log.ok("" + file.dest + " saved");
       }
       if (--this.screenshotCount === 0) {
-        return this.done();
+        return setTimeout((function(_this) {
+          return function() {
+            _this.ph.exit();
+            return _this.done();
+          };
+        })(this), this.options.closeDelay);
       }
     };
 

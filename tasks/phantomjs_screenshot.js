@@ -15,18 +15,16 @@ module.exports = function(grunt) {
 	grunt.registerMultiTask('phantomjs_screenshot', 'Takes screenshots of html files with phantomjs', function() {
 		var self = this;
 		var done = this.async();
-
-		// Merge task-specific and/or target-specific options with these defaults.
 		var options = this.options({
 			viewport: '1024x768',
-			delay: 300
+			delay: 300,
+			quality: 100,
+			closeDelay: 1000 // Workaround for https://github.com/ariya/phantomjs/issues/11084
 		});
 
 		var screenshooter = new Screenshooter();
-		screenshooter.init(grunt, options, function() {
-			screenshooter.takeScreenshots(self.files, function() {
-				done();
-			});
+		screenshooter.init(grunt, done, options, function() {
+			screenshooter.takeScreenshots(self.files);
 		});
 	});
 

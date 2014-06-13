@@ -1,8 +1,6 @@
 # grunt-phantomjs-screenshot
 
-# TODO WRITE README
-
-> Takes screenshots of html files with phantomjs
+> Takes screenshots of html files with phantomjs. With support of expanded files.
 
 ## Getting Started
 This plugin requires Grunt `~0.4.5`
@@ -39,46 +37,67 @@ grunt.initConfig({
 
 ### Options
 
-#### options.separator
+#### options.viewport
 Type: `String`
-Default value: `',  '`
+Default value: `1024x768`
 
-A string value that is used to do something with whatever.
+The resolution of the screen and the resulting resolution of the screenshots.
+WIDTHxHEIGHT
 
-#### options.punctuation
-Type: `String`
-Default value: `'.'`
+#### options.delay
+Type: `Integer`
+Default value: `300`
 
-A string value that is used to do something else with whatever else.
+The time in ms until the screenshot is taken
+
+#### options.quality
+Type: `Integer`
+Default value: `100`
+
+A integer from 0 to 100. It sets the quality of the resulting screenshot, important for jpg
+
+#### options.closeDelay
+Type: `Integer`
+Default value: `1000`
+
+Delay in ms until phantomjs gets closed. See Known Issues for more detail.
 
 ### Usage Examples
 
 #### Default Options
-In this example, the default options are used to do something with whatever. So if the `testing` file has the content `Testing` and the `123` file had the content `1 2 3`, the generated result would be `Testing, 1 2 3.`
+In this example, the default options are used to take a screenshot from all html files in the src folder. The screenshots
+are saved as png in the imagefolder
 
 ```js
 grunt.initConfig({
   phantomjs_screenshot: {
     options: {},
-    files: {
-      'dest/default_options': ['src/testing', 'src/123'],
-    },
+    files: [{
+			expand: true,
+			cwd: 'src/',
+			src: ['**/*.html'],
+			dest: 'imagefolder/',
+			ext: '.png'
+		}]
   },
 });
 ```
 
 #### Custom Options
-In this example, custom options are used to do something else with whatever else. So if the `testing` file has the content `Testing` and the `123` file had the content `1 2 3`, the generated result in this case would be `Testing: 1 2 3 !!!`
+In this example, custom options are used to do take a screenshot with 1920x1080px and poor quality.
+Also the closeDelay is reduced, because the jpeg should be saved fast with that poor quality.
 
 ```js
 grunt.initConfig({
   phantomjs_screenshot: {
     options: {
-      separator: ': ',
-      punctuation: ' !!!',
+		viewport: '1920x1080',
+		quality: 20,
+		delay: 1000,
+		closeDelay: 500
     },
     files: {
-      'dest/default_options': ['src/testing', 'src/123'],
+      'dest/screenshot.jpg': ['src/index.html'],
     },
   },
 });
@@ -87,5 +106,7 @@ grunt.initConfig({
 ## Contributing
 In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [Grunt](http://gruntjs.com/).
 
-## Release History
-_(Nothing yet)_
+## Known Issues
+If "Request() error evaluating render() call: Error: socket hang up" appears phantomjs was not fast enough to write the screenshots
+before exit. Render is not really blocking, see https://github.com/ariya/phantomjs/issues/11084
+If the error appears, increase the closeDelay option.

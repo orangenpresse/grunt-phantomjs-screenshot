@@ -1,4 +1,4 @@
-### 
+###*
 # Screenshooter
 # https://github.com/orangenpresse/grunt-phantomjs-screenshot
 #
@@ -6,10 +6,11 @@
 # Licensed under the MIT license.
 #
 ###
+
 phantom = require('node-phantom-simple');
 
 class Screenshooter
-	init: (@grunt, @options, callback) ->
+	init: (@grunt, @done, @options, callback) ->
 		phantom.create @getCreateCallback(callback), {
 			phantomPath: require('phantomjs').path
 		}
@@ -18,33 +19,42 @@ class Screenshooter
 		# use only first source filename
 		filename = file.src[0]
 
-		@page.open filename, @getPageOpenCallback =>
-			@setViewport @options.viewport
-			setTimeout( =>
-				@page.render file.dest
-				@setScreenshotDone file
-			, @options.delay)
+		@ph.createPage @getPageCallback (page) =>
+			page.open filename, @getPageOpenCallback =>
+				@setBackgroundColor(page)
+				setTimeout =>
+					page.render file.dest, {quality: @options.quality}
+					@setScreenshotDone file
+				, @options.delay
 
-	setViewport: (viewport) ->
+	setBackgroundColor: (page) ->
+		page.evaluate ->
+			### global document ###
+			document.body.bgColor = 'white'
+
+	setViewport: (page, viewport, callback) ->
 		resolution = viewport.split /x/
-		@page.viewportSize = {
+		page.set 'viewportSize', {
 			width: resolution[0],
 			height: resolution[1]
-		}
+		}, callback
 
 	getCreateCallback: (callback) ->
 		return (err, ph) =>
 			if err is null
-				ph.createPage @getPageCallback(ph, callback)
-			else
-				@grunt.log.error "PhantomJsCreateError: #{err.msg}"
-
-	getPageCallback: (ph, callback) ->
-		return (err, page) =>
-			if err is null
-				@page = page;
+				@ph = ph
 				callback()
 			else
+				@grunt.log.error "PhantomJsCreateError: #{err.msg}"
+				@done()
+
+	getPageCallback: (callback) ->
+		return (err, page) =>
+			if err is null
+				@setViewport page, @options.viewport, =>
+					callback(page)
+			else
+				@setScreenshotDone()
 				@grunt.log.error "PageCreateError: #{err.msg}"
 			
 	getPageOpenCallback: (callback) ->
@@ -58,9 +68,8 @@ class Screenshooter
 				else
 					@grunt.log.error "PageOpenError: #{status}"
 
-	takeScreenshots: (files, done) ->
+	takeScreenshots: (files) ->
 		@screenshotCount = files.length;
-		@done = done;
 		files.forEach (file) =>
 			@takeScreenshot(file);
 
@@ -68,6 +77,10 @@ class Screenshooter
 		if file
 			@grunt.log.ok "#{file.dest} saved"
 		if --@screenshotCount is 0
-			@done()
+			# Workaround for https://github.com/ariya/phantomjs/issues/11084
+			setTimeout =>
+				@ph.exit()
+				@done()
+			, @options.closeDelay
 
 module.exports = Screenshooter

@@ -16,6 +16,7 @@ module.exports = function(grunt) {
 			all: [
 				'Gruntfile.js',
 				'tasks/*.js',
+				'src/*.js',
 				'<%= nodeunit.tests %>'
 			],
 			options: {
@@ -31,32 +32,24 @@ module.exports = function(grunt) {
 		// Configuration to be run (and then tested).
 		phantomjs_screenshot: {
 			default_options: {
-				options: {
-					viewport: '1024x768',
-					delay: 300
-				},
+				options: {},
 				files: [{
 					expand: true,
-					flatten: false,
 					cwd: 'test/fixtures',
 					src: ['**/*.html'],
-					dest: 'tmp',
+					dest: 'tmp/default_options',
 					ext: '.png'
 				}]
 			},
 			custom_options: {
 				options: {
-					separator: ': ',
-					punctuation: ' !!!'
+					viewport: '1920x1080',
+					quality: 0,
+					closeDelay: 500
 				},
-				files: [{
-					expand: true,
-					flatten: false,
-					cwd: 'test/fixtures',
-					src: ['**/*.html'],
-					dest: 'tmp',
-					ext: '.png'
-				}]
+				files: {
+					'tmp/custom_options/index.jpg': ['test/fixtures/test.html']
+				}
 			}
 		},
 
@@ -65,6 +58,7 @@ module.exports = function(grunt) {
 			tests: ['test/*_test.js']
 		},
 
+		// Build coffee scripts
 		coffee: {
 			build: {
 				expand: true,
