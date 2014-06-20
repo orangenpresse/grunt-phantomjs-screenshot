@@ -7,24 +7,29 @@
 #
 ###
 
-phantom = require('node-phantom-simple');
+phantom = require('node-phantom-simple')
 
 class Screenshooter
 	init: (@grunt, @done, @options, callback) ->
+		@threads = 0
 		phantom.create @getCreateCallback(callback), {
 			phantomPath: require('phantomjs').path
 		}
 
 	takeScreenshot: (file) ->
+		@threads++
 		# use only first source filename
-		filename = file.src[0]
+		filename = process.cwd() + '/' + file.src[0]
 
 		@ph.createPage @getPageCallback (page) =>
 			page.open filename, @getPageOpenCallback =>
 				@setBackgroundColor(page)
 				setTimeout =>
-					page.render file.dest, {quality: @options.quality}
-					@setScreenshotDone file
+					destination = process.cwd() + '/' + file.dest
+					page.render destination, {quality: @options.quality}
+					@setScreenshotDone destination
+					@threads--
+					page.close()
 				, @options.delay
 
 	setBackgroundColor: (page) ->
@@ -69,13 +74,23 @@ class Screenshooter
 					@grunt.log.error "PageOpenError: #{status}"
 
 	takeScreenshots: (files) ->
-		@screenshotCount = files.length;
-		files.forEach (file) =>
-			@takeScreenshot(file);
+		@screenshotCount = files.length
+		@threadSpawner files
+
+	threadSpawner: (files) ->
+		if files.length is 0
+			return
+
+		if @threads < @options.maxConcurrent
+			@takeScreenshot files.pop()
+
+		setTimeout =>
+			@threadSpawner files
+		, 100
 
 	setScreenshotDone: (file) ->
 		if file
-			@grunt.log.ok "#{file.dest} saved"
+			@grunt.log.ok "#{file} saved"
 		if --@screenshotCount is 0
 			# Workaround for https://github.com/ariya/phantomjs/issues/11084
 			setTimeout =>

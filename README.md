@@ -62,6 +62,12 @@ Default value: `1000`
 
 Delay in ms until phantomjs gets closed. See Known Issues for more detail.
 
+#### options.maxConcurrent
+Type: `Integer`
+Default value: `3`
+
+The maximum of how many concurrent pages will be used for rendering.
+
 ### Usage Examples
 
 #### Default Options
@@ -70,16 +76,18 @@ are saved as png in the imagefolder
 
 ```js
 grunt.initConfig({
-  phantomjs_screenshot: {
-    options: {},
-    files: [{
-			expand: true,
-			cwd: 'src/',
-			src: ['**/*.html'],
-			dest: 'imagefolder/',
-			ext: '.png'
-		}]
-  },
+	phantomjs_screenshot: {
+		main: {
+			options: {},
+			files: [{
+				expand: true,
+				cwd: 'src/',
+				src: ['**/*.html'],
+				dest: 'imagefolder/',
+				ext: '.png'
+			}]
+		}
+	},
 });
 ```
 
@@ -89,17 +97,19 @@ Also the closeDelay is reduced, because the jpeg should be saved fast with that 
 
 ```js
 grunt.initConfig({
-  phantomjs_screenshot: {
-    options: {
-		viewport: '1920x1080',
-		quality: 20,
-		delay: 1000,
-		closeDelay: 500
-    },
-    files: {
-      'dest/screenshot.jpg': ['src/index.html'],
-    },
-  },
+	phantomjs_screenshot: {
+		main: {
+			options: {
+				viewport: '1920x1080',
+				quality: 20,
+				delay: 1000,
+				closeDelay: 500
+			},
+			files: {
+				'dest/screenshot.jpg': ['src/index.html'],
+			}
+		}
+	}
 });
 ```
 

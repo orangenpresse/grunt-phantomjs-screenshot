@@ -27,16 +27,19 @@
 
     Screenshooter.prototype.takeScreenshot = function(file) {
       var filename;
-      filename = file.src[0];
+      filename = process.cwd() + '/' + file.src[0];
       return this.ph.createPage(this.getPageCallback((function(_this) {
         return function(page) {
           return page.open(filename, _this.getPageOpenCallback(function() {
             _this.setBackgroundColor(page);
             return setTimeout(function() {
-              page.render(file.dest, {
+              var destination;
+              destination = process.cwd() + '/' + file.dest;
+              _this.grunt.file.mkdir(destination.split('/').slice(0, -1).join('/'));
+              page.render(destination, {
                 quality: _this.options.quality
               });
-              return _this.setScreenshotDone(file);
+              return _this.setScreenshotDone(destination);
             }, _this.options.delay);
           }));
         };
@@ -117,7 +120,7 @@
 
     Screenshooter.prototype.setScreenshotDone = function(file) {
       if (file) {
-        this.grunt.log.ok("" + file.dest + " saved");
+        this.grunt.log.ok("" + file + " saved");
       }
       if (--this.screenshotCount === 0) {
         return setTimeout((function(_this) {
