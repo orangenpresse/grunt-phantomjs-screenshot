@@ -50,6 +50,16 @@ module.exports = function(grunt) {
 				files: {
 					'tmp/custom_options/index.jpg': ['test/fixtures/test.html']
 				}
+			},
+			empty_folder: {
+				options: {},
+				files: [{
+					expand: true,
+					cwd: 'test/fixtures',
+					src: ['**/*.notExists'],
+					dest: 'tmp/empty_folder',
+					ext: '.png'
+				}]
 			}
 		},
 

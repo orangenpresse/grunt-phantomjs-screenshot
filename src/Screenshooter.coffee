@@ -74,18 +74,21 @@ class Screenshooter
 					@grunt.log.error "PageOpenError: #{status}"
 
 	takeScreenshots: (files) ->
+		if files.length is 0
+			@grunt.log.ok "No files found"
+			@done()
+			return
+
 		@screenshotCount = files.length
 		@threadSpawner files
 
 	threadSpawner: (files) ->
-		if files.length is 0
-			return
-
 		if @threads < @options.maxConcurrent
 			@takeScreenshot files.pop()
 
 		setTimeout =>
-			@threadSpawner files
+			if files.length > 0
+				@threadSpawner files
 		, 100
 
 	setScreenshotDone: (file) ->

@@ -20,6 +20,7 @@
       this.grunt = grunt;
       this.done = done;
       this.options = options;
+      this.threads = 0;
       return phantom.create(this.getCreateCallback(callback), {
         phantomPath: require('phantomjs').path
       });
@@ -27,6 +28,7 @@
 
     Screenshooter.prototype.takeScreenshot = function(file) {
       var filename;
+      this.threads++;
       filename = process.cwd() + '/' + file.src[0];
       return this.ph.createPage(this.getPageCallback((function(_this) {
         return function(page) {
@@ -35,11 +37,12 @@
             return setTimeout(function() {
               var destination;
               destination = process.cwd() + '/' + file.dest;
-              _this.grunt.file.mkdir(destination.split('/').slice(0, -1).join('/'));
               page.render(destination, {
                 quality: _this.options.quality
               });
-              return _this.setScreenshotDone(destination);
+              _this.setScreenshotDone(destination);
+              _this.threads--;
+              return page.close();
             }, _this.options.delay);
           }));
         };
@@ -110,12 +113,26 @@
     };
 
     Screenshooter.prototype.takeScreenshots = function(files) {
+      if (files.length === 0) {
+        this.grunt.log.ok("No files found");
+        this.done();
+        return;
+      }
       this.screenshotCount = files.length;
-      return files.forEach((function(_this) {
-        return function(file) {
-          return _this.takeScreenshot(file);
+      return this.threadSpawner(files);
+    };
+
+    Screenshooter.prototype.threadSpawner = function(files) {
+      if (this.threads < this.options.maxConcurrent) {
+        this.takeScreenshot(files.pop());
+      }
+      return setTimeout((function(_this) {
+        return function() {
+          if (files.length > 0) {
+            return _this.threadSpawner(files);
+          }
         };
-      })(this));
+      })(this), 100);
     };
 
     Screenshooter.prototype.setScreenshotDone = function(file) {
