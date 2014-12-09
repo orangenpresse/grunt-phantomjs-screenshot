@@ -30,6 +30,10 @@
       var filename;
       this.threads++;
       filename = process.cwd() + '/' + file.src[0];
+      if (this.options.server !== '') {
+        filename = this.options.server + file.src[0].replace(file.orig.cwd, '');
+      }
+
       return this.ph.createPage(this.getPageCallback((function(_this) {
         return function(page) {
           return page.open(filename, _this.getPageOpenCallback(function() {

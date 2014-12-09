@@ -68,6 +68,12 @@ Default value: `3`
 
 The maximum of how many concurrent pages will be used for rendering.
 
+#### options.server
+Type: `String`
+Default value: `''`
+
+Set hostname if using server.
+
 ### Usage Examples
 
 #### Default Options
