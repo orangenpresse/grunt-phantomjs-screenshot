@@ -20,7 +20,8 @@ module.exports = function(grunt) {
 			delay: 300,
 			quality: 100,
 			closeDelay: 1000, // Workaround for https://github.com/ariya/phantomjs/issues/11084
-			maxConcurrent: 3
+			maxConcurrent: 3,
+			server: '',
 		});
 
 		var screenshooter = new Screenshooter();
