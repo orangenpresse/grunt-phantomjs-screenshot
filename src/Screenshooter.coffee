@@ -12,9 +12,7 @@ phantom = require('node-phantom-simple')
 class Screenshooter
 	init: (@grunt, @done, @options, callback) ->
 		@threads = 0
-		phantom.create @getCreateCallback(callback), {
-			phantomPath: require('phantomjs').path
-		}
+		phantom.create @getCreateOptions(@options), @getCreateCallback(callback)
 
 	takeScreenshot: (file) ->
 		@threads++
@@ -25,6 +23,8 @@ class Screenshooter
 			page.open filename, @getPageOpenCallback =>
 				@setBackgroundColor(page)
 				setTimeout =>
+					if @options.clearCache is true
+						page.clearMemoryCache()
 					destination = process.cwd() + '/' + file.dest
 					page.render destination, {quality: @options.quality}
 					@setScreenshotDone destination
@@ -43,6 +43,12 @@ class Screenshooter
 			width: resolution[0],
 			height: resolution[1]
 		}, callback
+
+	getCreateOptions: (options) ->
+		return  {
+			path: require('phantomjs-prebuilt').path,
+			parameters: options.phantomStartParameters || [],
+		}
 
 	getCreateCallback: (callback) ->
 		return (err, ph) =>
