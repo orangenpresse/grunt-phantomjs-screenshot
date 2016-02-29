@@ -20,11 +20,11 @@ class Screenshooter
 		filename = process.cwd() + '/' + file.src[0]
 
 		@ph.createPage @getPageCallback (page) =>
+			if @options.clearCache is true
+				page.clearMemoryCache()
 			page.open filename, @getPageOpenCallback =>
 				@setBackgroundColor(page)
 				setTimeout =>
-					if @options.clearCache is true
-						page.clearMemoryCache()
 					destination = process.cwd() + '/' + file.dest
 					page.render destination, {quality: @options.quality}
 					@setScreenshotDone destination
