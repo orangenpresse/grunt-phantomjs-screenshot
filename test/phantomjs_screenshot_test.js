@@ -23,5 +23,5 @@ exports.phantomjs_screenshot = {
     test.equal(actual, expected, 'should render jpg files with custom_options and low quality');
 
     test.done();
-  },
+  }
 };

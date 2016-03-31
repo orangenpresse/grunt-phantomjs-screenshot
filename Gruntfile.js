@@ -45,7 +45,9 @@ module.exports = function(grunt) {
 				options: {
 					viewport: '1920x1080',
 					quality: 0,
-					closeDelay: 500
+					closeDelay: 500,
+					clearMemoryCache: true,
+					phantomStartParameters: {"load-images":"false"}
 				},
 				files: {
 					'tmp/custom_options/index.jpg': ['test/fixtures/test.html']

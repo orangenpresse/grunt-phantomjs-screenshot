@@ -74,6 +74,19 @@ Default value: `''`
 
 Set hostname if using server.
 
+#### options.clearMemoryCache
+Type: `Boolean`
+If set to true, the browser cache is emptied using the API described in 
+[this phantomjs issue](https://github.com/ariya/phantomjs/commit/5768b705a0), making sure you do not get stalled screen shots.
+Default value: `false`
+ 
+#### options.phantomStartParameters
+Type: `Object`
+If set, the value is passed to phantomjs when starting the child process. See 
+[the phantomjs API](http://phantomjs.org/api/command-line.html) for possible options and
+[this reference](https://github.com/baudehlo/node-phantom-simple#createoptions-callback) on how to format parameters. 
+
+
 ### Usage Examples
 
 #### Default Options

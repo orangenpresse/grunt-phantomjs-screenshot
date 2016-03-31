@@ -21,25 +21,22 @@
       this.done = done;
       this.options = options;
       this.threads = 0;
-      return phantom.create(this.getCreateCallback(callback), {
-        phantomPath: require('phantomjs').path
-      });
+      return phantom.create(this.getCreateOptions(this.options), this.getCreateCallback(callback));
     };
 
     Screenshooter.prototype.takeScreenshot = function(file) {
       var filename;
       this.threads++;
       filename = process.cwd() + '/' + file.src[0];
-      if (this.options.server !== '') {
-        filename = this.options.server + file.src[0].replace(file.orig.cwd, '');
-      }
-
       return this.ph.createPage(this.getPageCallback((function(_this) {
         return function(page) {
           return page.open(filename, _this.getPageOpenCallback(function() {
             _this.setBackgroundColor(page);
             return setTimeout(function() {
               var destination;
+              if (_this.options.clearCache === true) {
+                page.clearMemoryCache();
+              }
               destination = process.cwd() + '/' + file.dest;
               page.render(destination, {
                 quality: _this.options.quality
@@ -68,6 +65,13 @@
         width: resolution[0],
         height: resolution[1]
       }, callback);
+    };
+
+    Screenshooter.prototype.getCreateOptions = function(options) {
+      return {
+        path: require('phantomjs-prebuilt').path,
+        parameters: options.phantomStartParameters || []
+      };
     };
 
     Screenshooter.prototype.getCreateCallback = function(callback) {
