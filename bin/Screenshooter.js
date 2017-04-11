@@ -31,7 +31,7 @@
       this.threads++;
       filename = process.cwd() + '/' + file.src[0];
       if (this.options.server !== '') {
-        filename = this.options.server + file.src[0].replace(file.orig.cwd, '');
+        filename = this.options.server + file.orig.src[0].replace(file.orig.cwd, '');
       }
 
       return this.ph.createPage(this.getPageCallback((function(_this) {
